@@ -12,16 +12,20 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Unity
-        uses: game-ci/unity-setup@v2
+      - name: Cache Unity Library
+        uses: actions/cache@v3
         with:
-          unityVersion: 6000.2.2f1
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
 
       - name: Build project
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-actions/build@v4
         with:
+          unityVersion: 6000.2.2f1
           targetPlatform: StandaloneWindows64
 
       - name: Compress build folder
