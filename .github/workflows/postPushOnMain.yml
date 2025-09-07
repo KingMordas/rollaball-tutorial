@@ -1,0 +1,57 @@
+name: Unity Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Unity Project
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Unity
+        uses: game-ci/unity-setup@v2
+        with:
+          unityVersion: 6000.2.2f1
+
+      - name: Build project
+        uses: game-ci/unity-builder@v2
+        with:
+          targetPlatform: StandaloneWindows64
+
+      - name: Compress build folder
+        run: |
+          cd build/StandaloneWindows64
+          Compress-Archive -Path * -DestinationPath ../../RollABallBuild.zip
+
+      - name: Upload zipped build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: RollABallBuild
+          path: RollABallBuild.zip
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download zipped build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: RollABallBuild
+          path: ./release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "Roll-a-Ball Build v${{ github.run_number }}"
+          files: ./release/RollABallBuild.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
