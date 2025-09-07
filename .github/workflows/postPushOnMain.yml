@@ -30,7 +30,7 @@ jobs:
           Compress-Archive -Path * -DestinationPath ../../RollABallBuild.zip
 
       - name: Upload zipped build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: RollABallBuild
           path: RollABallBuild.zip
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Download zipped build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: RollABallBuild
           path: ./release
